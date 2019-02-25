@@ -11,7 +11,7 @@ var connection = mysql.createConnection({
   user: "root",
 
   // Your password
-  password: "Circle08",
+  password: "",
   database: "bamazon"
 });
 
@@ -22,17 +22,18 @@ connection.connect(function (err) {
 
 });
 
+var itemIDArray = [];
+
 function searchBamazon() {
 
   connection.query("select * from products", function (err, res) {
     if (err) throw err;
 
-    // console.log(res);
     console.log(`\n`)
     console.log(`Item ID  ` + `Product Name   ` + ` Department Name ` + ` Price ` + ` Stock Quantity`)
-    for (var i = 0; i < res.length; i++) {
-
-
+    for (var i = 0; i < res.length; i++) {      
+      
+      itemIDArray.push(res[i].item_id);
       console.log(res[i].item_id + `      ` + res[i].product_name + `     ` + res[i].department_name + `      ` + res[i].price + `      ` + res[i].stock_quantity);
 
     }
@@ -50,10 +51,12 @@ function inquirerFunction() {
         type: "input",
         name: "ID",
         validate: function (value) {
-          if (isNaN(value) === false && parseInt(value)) {
+         var test = parseInt(value);
+          if (itemIDArray.includes(test)){
+          
             return true;
           }
-          return false;
+            return false;
         }
 
       },
@@ -79,7 +82,7 @@ function inquirerFunction() {
 
       connection.query(`select * from products where item_id =${selectedProduct}`, (err, res) => {
         if (err) throw err;
-
+                        
         if (res[0].stock_quantity > selectedStock) {
 
           var newStockQuantity = res[0].stock_quantity - selectedStock;
